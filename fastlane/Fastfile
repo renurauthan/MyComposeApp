@@ -1,0 +1,100 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:android)
+
+platform :android do
+  desc "Run tests"
+  lane :test do
+    gradle(task: "test")
+  end
+
+  desc "Build APK"
+  lane :build do
+    gradle(task: "assembleRelease")
+  end
+
+  desc "Build and upload to internal track"
+  lane :deploy_internal do
+    gradle(
+      task: "bundle",
+      build_type: "Release"
+    )
+
+    upload_to_play_store(
+      track: 'internal',
+      aab: 'app/build/outputs/bundle/release/app-release.aab',
+      skip_upload_metadata: true,
+      skip_upload_images: true,
+      skip_upload_screenshots: true
+    )
+  end
+
+
+  desc "Bump version and commit"
+  lane :bump_version do
+    gradle_file = "../app/build.gradle"
+
+    # Extract versionName using grep
+    version_line = sh("grep versionName #{gradle_file}").strip
+    version = version_line[/\"(.*?)\"/, 1]
+
+    # Increment patch version (e.g., 1.0.0 → 1.0.1)
+    segments = version.split('.').map(&:to_i)
+    segments[-1] += 1
+    new_version = segments.join('.')
+
+    # Replace versionName in the gradle file
+    sh("sed -i '' 's/versionName \\\"#{version}\\\"/versionName \\\"#{new_version}\\\"/' #{gradle_file}")
+
+    UI.message("version: #{version}")
+    UI.message("new_version: #{new_version}")
+
+    # Commit version bump
+   # commit_version_bump(
+   #   message: "Bump version to #{new_version}"
+  #  )
+  end
+
+
+  desc "Run all steps"
+  lane :release do
+    prepare_google_services_json
+
+    test
+    build
+   # deploy_internal
+    bump_version
+    cleanup_google_services_json
+  end
+
+
+  private_lane :prepare_google_services_json do
+    UI.message("Current working directory: #{Dir.pwd}")
+    UI.message("Listing files here:")
+    sh "ls -la"
+
+    sh "cp google-services.json ../app/google-services.json"
+  end
+
+
+  private_lane :cleanup_google_services_json do
+    UI.message("🧹 Cleaning up google-services.json from app/")
+    sh "rm ../app/google-services.json"
+  end
+end
+
+
+

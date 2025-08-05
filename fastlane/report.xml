@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuites>
+  <testsuite name="fastlane.lanes">
+    
+    
+    
+      
+      <testcase classname="fastlane.lanes" name="00: default_platform" time="0.000658">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="01: Switch to android prepare_google_services_json lane" time="0.000124">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="02: ls -la" time="0.023319">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="03: cp google-services.json ../app/google-services.json" time="0.018198">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="04: Switch to android test lane" time="0.000157">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="05: test" time="3.425915">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="06: Switch to android build lane" time="0.000573">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="07: assembleRelease" time="2.729077">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="08: Switch to android bump_version lane" time="0.000259">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="09: grep versionName ../app/build.gradle" time="0.021852">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="10: sed -i &apos;&apos; &apos;s/versionName \&quot;1.0\&quot;/versionName \&quot;1.1\&quot;/&apos; ../app/build.gradle" time="0.054157">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="11: Switch to android cleanup_google_services_json lane" time="0.000197">
+        
+      </testcase>
+    
+      
+      <testcase classname="fastlane.lanes" name="12: rm ../app/google-services.json" time="0.022504">
+        
+      </testcase>
+    
+  </testsuite>
+</testsuites>
