@@ -16,7 +16,7 @@ plugins {
 allprojects {
     tasks.withType(KotlinCompile).configureEach {
         compilerOptions {
-            jvmTarget = "1.8"
+            jvmTarget.set(JvmTarget.JVM_1_8)
         }
     }
 }
