@@ -13,40 +13,44 @@ jobs:
     steps:
       # Step 1: Checkout repository
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Step 2: Set up JDK
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: gradle
 
-      # Step 3: Set up Ruby (Fastlane is a Ruby gem)
+      # Step 3: Make gradlew executable (just in case)
+      - name: Grant execute permission for gradlew
+        run: chmod +x gradlew
+
+      # Step 4: Set up Ruby (for Fastlane)
       - name: Set up Ruby
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.1'
           bundler-cache: true
 
-      # Step 4: Install Bundler & Fastlane
+      # Step 5: Install Bundler & Fastlane
       - name: Install Fastlane
         run: |
           gem install bundler
           gem install fastlane
 
-      # Step 5: Run Fastlane test lane (unit tests)
+      # Step 6: Run Fastlane lane for unit tests
       - name: Run Fastlane tests
         run: bundle exec fastlane android test
 
-      # Step 6: Run Fastlane build lane (build APK)
+      # Step 7: Run Fastlane lane for building APK
       - name: Run Fastlane build
         run: bundle exec fastlane android beta
 
-      # Step 7: Upload APK as artifact
-      - name: Upload APK
-        uses: actions/upload-artifact@v3
+      # Step 8: Upload APK as artifact (✅ v4, not deprecated)
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
         with:
           name: app-release-apk
           path: app/build/outputs/apk/release/app-release.apk
