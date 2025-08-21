@@ -67,7 +67,8 @@ lane :bump_version do
   UI.message("new_version: #{new_version}")
 
   # Commit version bump (uncomment if you want auto commit)
-   commit_version_bump(message: "Bump version to #{new_version}")
+     sh("git add #{gradle_file}")
+     sh("git commit -m 'Bump version to #{new_version}'")
 end
 
 
