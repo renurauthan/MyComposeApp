@@ -43,11 +43,11 @@ platform :android do
   end
 
 
-desc "Bump version and commit"
+desc "Bump versionName and versionCode for Android and commit"
 lane :bump_version do
   gradle_file = "../app/build.gradle"
 
-  # Extract versionName
+  # Extract current versionName
   version_line = File.readlines(gradle_file).find { |line| line.include?("versionName") }
   version = version_line[/\"(.*?)\"/, 1]
 
@@ -56,20 +56,37 @@ lane :bump_version do
   segments[-1] += 1
   new_version = segments.join('.')
 
-  # Replace versionName in the gradle file
-  new_contents = File.read(gradle_file).gsub(
-    /versionName\s+"#{version}"/,
-    "versionName \"#{new_version}\""
-  )
+  # Extract and increment versionCode
+  version_code_line = File.readlines(gradle_file).find { |line| line.include?("versionCode") }
+  version_code = version_code_line[/\d+/].to_i
+  new_version_code = version_code + 1
+
+  # Update versionName and versionCode in Gradle file
+  new_contents = File.read(gradle_file)
+                      .gsub(/versionName\s+"#{version}"/, "versionName \"#{new_version}\"")
+                      .gsub(/versionCode\s+#{version_code}/, "versionCode #{new_version_code}")
   File.write(gradle_file, new_contents)
 
-  UI.message("version: #{version}")
-  UI.message("new_version: #{new_version}")
+  UI.message("Old versionName: #{version}")
+  UI.message("New versionName: #{new_version}")
+  UI.message("Old versionCode: #{version_code}")
+  UI.message("New versionCode: #{new_version_code}")
 
-  # Commit version bump (uncomment if you want auto commit)
-     sh("git add #{gradle_file}")
-     sh("git commit -m 'Bump version to #{new_version}'")
+  # Ensure git identity is set (use defaults in CI if missing)
+  user_name = sh("git config --get user.name || echo ''").strip
+  user_email = sh("git config --get user.email || echo ''").strip
+
+  if user_name.empty? || user_email.empty?
+    UI.message("Git identity not set. Using CI defaults...")
+    sh("git config user.name 'GitHub Actions'")
+    sh("git config user.email 'actions@github.com'")
+  end
+
+  # Commit version bump
+  sh("git add #{gradle_file}")
+  sh("git commit -m 'Bump version to #{new_version} (code #{new_version_code})'")
 end
+
 
 
   desc "Run all steps"
